@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期转星期几查询工具</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 4px;
+            display: none;
+        }
+        .test-cases {
+            margin-top: 30px;
+            background-color: #e7f3fe;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>日期转星期几查询工具</h1>
+        
+        <div class="input-group">
+            <label for="dateInput">请输入日期 (YYYY-MM-DD):</label>
+            <input type="text" id="dateInput" placeholder="例如: 2023-05-15">
+        </div>
+        
+        <button onclick="calculateDay()">查询星期几</button>
+        
+        <div id="result"></div>
+        
+        <div class="test-cases">
+            <h2>测试用例设计</h2>
+            <h3>等价类划分法</h3>
+            <table>
+                <tr>
+                    <th>等价类</th>
+                    <th>有效/无效</th>
+                    <th>测试用例</th>
+                    <th>预期结果</th>
+                </tr>
+                <tr>
+                    <td>正确格式的日期</td>
+                    <td>有效</td>
+                    <td>2023-05-15</td>
+                    <td>显示正确的星期几</td>
+                </tr>
+                <tr>
+                    <td>格式错误的日期</td>
+                    <td>无效</td>
+                    <td>2023/05/15</td>
+                    <td>提示格式错误</td>
+                </tr>
+                <tr>
+                    <td>不存在的日期</td>
+                    <td>无效</td>
+                    <td>2023-02-30</td>
+                    <td>提示日期无效</td>
+                </tr>
+                <tr>
+                    <td>超出范围的年份</td>
+                    <td>无效</td>
+                    <td>10000-01-01</td>
+                    <td>提示年份超出范围</td>
+                </tr>
+            </table>
+            
+            <h3>边界值分析法</h3>
+            <table>
+                <tr>
+                    <th>边界条件</th>
+                    <th>测试用例</th>
+                    <th>预期结果</th>
+                </tr>
+                <tr>
+                    <td>2月28日（非闰年）</td>
+                    <td>2023-02-28</td>
+                    <td>星期二</td>
+                </tr>
+                <tr>
+                    <td>2月29日（闰年）</td>
+                    <td>2024-02-29</td>
+                    <td>星期四</td>
+                </tr>
+                <tr>
+                    <td>12月31日</td>
+                    <td>2023-12-31</td>
+                    <td>星期日</td>
+                </tr>
+                <tr>
+                    <td>1月1日</td>
+                    <td>2023-01-01</td>
+                    <td>星期日</td>
+                </tr>
+                <tr>
+                    <td>最小年份</td>
+                    <td>0001-01-01</td>
+                    <td>星期一</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculateDay() {
+            const dateInput = document.getElementById('dateInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            // 验证日期格式
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+                resultDiv.innerHTML = "错误：日期格式不正确，请使用YYYY-MM-DD格式";
+                resultDiv.style.display = "block";
+                resultDiv.style.backgroundColor = "#ffebee";
+                return;
+            }
+            
+            const parts = dateInput.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            const day = parseInt(parts[2]);
+            
+            // 验证日期有效性
+            const date = new Date(year, month - 1, day);
+            if (date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
+                resultDiv.innerHTML = "错误：输入的日期不存在";
+                resultDiv.style.display = "block";
+                resultDiv.style.backgroundColor = "#ffebee";
+                return;
+            }
+            
+            // 计算星期几
+            const days = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+            const dayOfWeek = days[date.getDay()];
+            
+            resultDiv.innerHTML = `日期 ${dateInput} 是 ${dayOfWeek}`;
+            resultDiv.style.display = "block";
+            resultDiv.style.backgroundColor = "#e9f7ef";
+        }
+    </script>
+</body>
+</html>
